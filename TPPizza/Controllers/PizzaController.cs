@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using TPPizza.Database;
+using TPPizza.Models;
 
 namespace TPPizza.Controllers
 {
@@ -23,7 +25,10 @@ namespace TPPizza.Controllers
         // GET: Pizza/Create
         public ActionResult Create()
         {
-            return View();
+            PizzaCreateViewModel vm = new PizzaCreateViewModel();
+            vm.Ingredients = FakeDBPizza.Instance.IngredientsDisponibles;
+            vm.Pate = FakeDBPizza.Instance.PatesDisponibles;
+            return View(vm);
         }
 
         // POST: Pizza/Create

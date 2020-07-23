@@ -107,16 +107,23 @@ namespace TPPizza.Controllers
         {
             try
             {
-                Pizza pizza = FakeDBPizza.Instance.Pizzas.FirstOrDefault(x => x.Id == vm.Pizza.Id);
-                pizza.Nom = vm.Pizza.Nom;
-                pizza.Pate = FakeDBPizza.Instance.PatesDisponibles.FirstOrDefault(x => x.Id == vm.PateId);
-                pizza.Ingredients = FakeDBPizza.Instance.IngredientsDisponibles.Where(x => vm.IngredientIds.Contains(x.Id)).ToList();
+                if (ModelState.IsValid && ValidateVM(vm))
+                {
+                    Pizza pizza = FakeDBPizza.Instance.Pizzas.FirstOrDefault(x => x.Id == vm.Pizza.Id);
+                    pizza.Nom = vm.Pizza.Nom;
+                    pizza.Pate = FakeDBPizza.Instance.PatesDisponibles.FirstOrDefault(x => x.Id == vm.PateId);
+                    pizza.Ingredients = FakeDBPizza.Instance.IngredientsDisponibles.Where(x => vm.IngredientIds.Contains(x.Id)).ToList();
 
-                return RedirectToAction("Index");
+                    return RedirectToAction("Index");
+                }
+                else 
+                { 
+                    return View(vm); 
+                }
             }
             catch
             {
-                return View();
+                return View(vm);
             }
         }
 

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
-using TPModule5_2.Models;
+using TPPizza.Models;
 
-namespace TPModule5_2.Helpers
+namespace TPPizza.Helpers
 {
     public static class MyHelpers
     {

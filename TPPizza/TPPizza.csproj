@@ -176,6 +176,7 @@
     <Content Include="Views\Pizza\Index.cshtml" />
     <Content Include="Views\Shared\_PizzaDisplay.cshtml" />
     <Content Include="Views\Shared\_PizzaDisplayWithId.cshtml" />
+    <Content Include="Views\Pizza\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

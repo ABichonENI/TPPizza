@@ -49,9 +49,7 @@ namespace TPPizza.Controllers
                         x => vm.IngredientIds.Contains(x.Id))
                         .ToList();
 
-                    // Insuffisant
-                    //pizza.Id = FakeDb.Instance.Pizzas.Count + 1;
-
+                    
                     pizza.Id = FakeDBPizza.Instance.Pizzas.Count == 0 ? 1 : FakeDBPizza.Instance.Pizzas.Max(x => x.Id) + 1;
 
                     FakeDBPizza.Instance.Pizzas.Add(pizza);
@@ -60,13 +58,9 @@ namespace TPPizza.Controllers
                 }
                 else
                 {
-          //          vm.Pates = FakeDBPizza.Instance.PatesDisponibles.Select(
-            //    x => new SelectListItem { Text = x.Nom, Value = x.Id.ToString() })
-              //  .ToList();
-              //
-                //    vm.Ingredients = FakeDBPizza.Instance.IngredientsDisponibles.Select(
-                  //      x => new SelectListItem { Text = x.Nom, Value = x.Id.ToString() })
-                    //    .ToList();
+                    vm.Pates = FakeDBPizza.Instance.PatesDisponibles;
+
+                    vm.Ingredients = FakeDBPizza.Instance.IngredientsDisponibles;
 
                     return View(vm);
                 }
@@ -87,13 +81,9 @@ namespace TPPizza.Controllers
         {
             PizzaCreateViewModel vm = new PizzaCreateViewModel();
 
-            vm.Pate = FakeDBPizza.Instance.PatesDisponibles.Select(
-                x => new SelectListItem { Text = x.Nom, Value = x.Id.ToString() })
-                .ToList();
+            vm.Pates = FakeDBPizza.Instance.PatesDisponibles;
 
-            vm.Ingredients = FakeDBPizza.Instance.IngredientsDisponibles.Select(
-                x => new SelectListItem { Text = x.Nom, Value = x.Id.ToString() })
-                .ToList();
+            vm.Ingredients = FakeDBPizza.Instance.IngredientsDisponibles;
 
             vm.Pizza = FakeDBPizza.Instance.Pizzas.FirstOrDefault(x => x.Id == id);
 
@@ -108,7 +98,7 @@ namespace TPPizza.Controllers
             }
 
             return View(vm);
-            return View();
+            
         }
 
         // POST: Pizza/Edit/5

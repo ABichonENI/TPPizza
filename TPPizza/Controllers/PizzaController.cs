@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.EnterpriseServices;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Services.Protocols;
 using TPPizza.Database;
 using TPPizza.Models;
 
@@ -27,7 +29,14 @@ namespace TPPizza.Controllers
         // GET: Pizza/Create
         public ActionResult Create()
         {
+            pizzas = FakeDBPizza.Instance.Pizzas;
             PizzaCreateViewModel vm = new PizzaCreateViewModel();
+            //if (pizzas.Any(p => p.Nom.ToUpper() == vm.Pizza.Nom.ToUpper()))
+            //{
+              //  ModelState.AddModelError("", "Il existe déjà une pizza avec ce nom");
+                //return View(vm);
+            //}
+                       
             vm.Ingredients = FakeDBPizza.Instance.IngredientsDisponibles;
             vm.Pates = FakeDBPizza.Instance.PatesDisponibles;
             return View(vm);
@@ -102,13 +111,31 @@ namespace TPPizza.Controllers
         }
 
         // POST: Pizza/Edit/5
+
+        private List<Pizza> pizzas = new List<Pizza>();
+        
+        
         [HttpPost]
         public ActionResult Edit(PizzaCreateViewModel vm)
         {
-            try
+           try
             {
+               
                 if (ModelState.IsValid && ValidateVM(vm))
                 {
+                    pizzas = FakeDBPizza.Instance.Pizzas;
+                    if (pizzas.Any(p=>p.Nom.ToUpper()==vm.Pizza.Nom.ToUpper() && vm.Pizza.Id != p.Id))
+                    {
+                        ModelState.AddModelError("", "Il existe déjà une pizza avec ce nom");
+                        return View(vm);     
+                    }
+
+                    if (vm.Pizza.Ingredients.Count<2 || vm.Pizza.Ingredients.Count>5)
+                    {
+                        ModelState.AddModelError("", "Une pizza doit contenir au moins 2  et au plus 5 ingrédients");
+                        return View(vm);
+                    }
+
                     Pizza pizza = FakeDBPizza.Instance.Pizzas.FirstOrDefault(x => x.Id == vm.Pizza.Id);
                     pizza.Nom = vm.Pizza.Nom;
                     pizza.Pate = FakeDBPizza.Instance.PatesDisponibles.FirstOrDefault(x => x.Id == vm.PateId);

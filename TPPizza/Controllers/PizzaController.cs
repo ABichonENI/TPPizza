@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Services.Protocols;
+using Microsoft.Ajax.Utilities;
 using TPPizza.Database;
 using TPPizza.Models;
 
@@ -31,12 +32,7 @@ namespace TPPizza.Controllers
         {
             pizzas = FakeDBPizza.Instance.Pizzas;
             PizzaCreateViewModel vm = new PizzaCreateViewModel();
-            //if (pizzas.Any(p => p.Nom.ToUpper() == vm.Pizza.Nom.ToUpper()))
-            //{
-              //  ModelState.AddModelError("", "Il existe déjà une pizza avec ce nom");
-                //return View(vm);
-            //}
-                       
+                                  
             vm.Ingredients = FakeDBPizza.Instance.IngredientsDisponibles;
             vm.Pates = FakeDBPizza.Instance.PatesDisponibles;
             return View(vm);
@@ -50,6 +46,19 @@ namespace TPPizza.Controllers
             {
                 if (ModelState.IsValid && ValidateVM(vm))
                 {
+                    pizzas = FakeDBPizza.Instance.Pizzas;
+                    if (pizzas.Any(p => p.Nom.ToUpper() == vm.Pizza.Nom.ToUpper()))
+                    {
+                        ModelState.AddModelError("", "Il existe déjà une pizza avec ce nom");
+                        return View(vm);
+                    }
+
+                    if (vm.Pizza.Ingredients.Count < 2 || vm.Pizza.Ingredients.Count > 5)
+                    {
+                        ModelState.AddModelError("", "Une pizza doit contenir au moins 2  et au plus 5 ingrédients");
+                        return View(vm);
+                    }
+
                     Pizza pizza = vm.Pizza;
 
                     pizza.Pate = FakeDBPizza.Instance.PatesDisponibles.FirstOrDefault(x => x.Id == vm.PateId);
@@ -113,7 +122,7 @@ namespace TPPizza.Controllers
         // POST: Pizza/Edit/5
 
         private List<Pizza> pizzas = new List<Pizza>();
-        
+        private List<int> ingredientsPizza = new List<int>();
         
         [HttpPost]
         public ActionResult Edit(PizzaCreateViewModel vm)
@@ -124,6 +133,9 @@ namespace TPPizza.Controllers
                 if (ModelState.IsValid && ValidateVM(vm))
                 {
                     pizzas = FakeDBPizza.Instance.Pizzas;
+                    List<List<int>> ingredientsPizza = pizzas.Select(i=> i.Ingredients.Select(x=>x.Id).ToList()).ToList();
+                    List<int> pizzaIngredients = new List<int>();
+                                       
                     if (pizzas.Any(p=>p.Nom.ToUpper()==vm.Pizza.Nom.ToUpper() && vm.Pizza.Id != p.Id))
                     {
                         ModelState.AddModelError("", "Il existe déjà une pizza avec ce nom");
@@ -134,6 +146,28 @@ namespace TPPizza.Controllers
                     {
                         ModelState.AddModelError("", "Une pizza doit contenir au moins 2  et au plus 5 ingrédients");
                         return View(vm);
+                    }
+                                      
+                    foreach (Pizza p in pizzas)
+                    {
+                       
+                        foreach (Ingredient i in p.Ingredients ) 
+                        {
+                            
+                            pizzaIngredients.Add(i.Id);                                                 
+                             
+                        }
+
+                       for (int i = 0; i < pizzaIngredients.Count; i++)
+                        {
+                            if (vm.IngredientIds.ElementAt(i) != pizzaIngredients.ElementAt(i))
+                            {
+                                return RedirectToAction("Index");
+                            }
+                            ModelState.AddModelError("", "2 pizzas différentes ne peuvent contenir la même liste d'ingrédients");
+                        return View(vm);
+                        }
+                        
                     }
 
                     Pizza pizza = FakeDBPizza.Instance.Pizzas.FirstOrDefault(x => x.Id == vm.Pizza.Id);
